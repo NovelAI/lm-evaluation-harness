@@ -2,12 +2,13 @@ import transformers
 import torch
 from lm_eval.base import BaseLM
 import basedformer.sampling as sampling
+import basedformer.lm_utils as lmu
 
 class BasedformerLM(BaseLM):
     def __init__(
         self,
         device="cuda",
-        pretrained : nn.Module = None,
+        pretrained : str = None,
         tokenizer=None,
         batch_size=1,
     ):
@@ -28,7 +29,7 @@ class BasedformerLM(BaseLM):
             )
 
         # TODO: update this to be less of a hack once subfolder is fixed in HF
-        self.gpt2 = pretrained
+        self.gpt2 = lmu.load_from_path(pretrained).to(self._device).half().eval()
 
         # pretrained tokenizer for neo is broken for now so just hard-coding this to gpt2
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
